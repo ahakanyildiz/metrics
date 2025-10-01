@@ -8,8 +8,8 @@ import threading
 # --- Ayarlar ---
 # Metriklerin toplanma aralığı (saniye)
 SAMPLING_INTERVAL = 1 
-# Rapor dosyasının adı (Docker için environment variable kullan)
-REPORT_FILE = os.getenv("REPORT_FILE", "server_metrics_report.csv")
+# Rapor dosyasının adı
+REPORT_FILE = "server_metrics_report.csv"
 # İzleme döngüsünü durdurmak için kullanılacak olay
 stop_event = threading.Event()
 
