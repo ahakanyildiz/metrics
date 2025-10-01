@@ -8,8 +8,8 @@ import threading
 # --- Ayarlar ---
 # Metriklerin toplanma aralığı (saniye)
 SAMPLING_INTERVAL = 1 
-# Rapor dosyasının adı
-REPORT_FILE = "server_metrics_report.csv"
+# Rapor dosyasının adı (Docker için environment variable kullan)
+REPORT_FILE = os.getenv("REPORT_FILE", "server_metrics_report.csv")
 # İzleme döngüsünü durdurmak için kullanılacak olay
 stop_event = threading.Event()
 
@@ -69,13 +69,9 @@ def monitor_system():
             # --- Diğer Metrikler ---
             # Sistemdeki açık dosya tanımlayıcıları (socket limitini görmek için önemli)
             try:
-                # psutil'in uygun metodunu kullan
                 open_files = psutil.test().num_fds
-            except AttributeError:
-                # num_fds mevcut değilse (bazı sistemlerde veya psutil sürümlerinde olabilir)
-                open_files = "N/A"
-            except Exception:
-                open_files = "Error"
+            except:
+                 open_files = "N/A"
             
             # Sistemdeki çalışan toplam işlem sayısı
             process_count = len(psutil.pids())
@@ -118,24 +114,19 @@ def stop_monitor(thread):
     print(f"\n[{datetime.now().strftime('%H:%M:%S')}] Sunucu metrik takibi sonlandırıldı.")
     print(f"Rapor '{REPORT_FILE}' dosyasında kaydedildi.")
 
-# --- Kullanım Örneği (SÜREKLİ İZLEME İÇİN DEĞİŞTİRİLDİ) ---
+# --- Kullanım Örneği ---
 if __name__ == "__main__":
     
     # 1. İzlemeyi başlat
     monitor_thread = start_monitor()
     
-    # 2. Metriklerinizi sürekli toplayın
-    print("Metrikler toplanmaya başladı. Durdurmak ve raporu kaydetmek için **Ctrl+C** tuşlarına basın.")
-    
+    # 2. Burada yük testi kodunuzu çalıştırın (veya manuel olarak yük testini başlatın)
+    # ÖRNEK: 20 saniye boyunca metrik topla
+    print("Metrikler 20 saniye boyunca toplanıyor... Lütfen şimdi yük testinizi başlatın.")
     try:
-        # Ana iş parçacığını, kullanıcı kesintisine (Ctrl+C) yanıt verecek şekilde sürekli aktif tutar.
-        while True:
-            time.sleep(0.1) 
+        time.sleep(20) # Bu süreyi gerçek test sürenizle değiştirin
     except KeyboardInterrupt:
-        # Kullanıcı Ctrl+C bastığında bu blok çalışır
-        print("\nKullanıcı tarafından durdurma sinyali alındı.")
-        pass # Sonlandırma işlemine geç
-        
+        pass
 
-    # 3. İzlemeyi durdur ve dosyayı kaydet
+    # 3. İzlemeyi durdur
     stop_monitor(monitor_thread)

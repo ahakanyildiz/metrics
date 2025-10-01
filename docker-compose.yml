@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  metrics-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: server-metrics-monitor
+    volumes:
+      # Rapor dosyalarının kaydedileceği klasör
+      - ./reports:/app/reports
+    restart: unless-stopped
+    # Container'ı interaktif modda çalıştır (Ctrl+C ile durdurabilmek için)
+    stdin_open: true
+    tty: true
