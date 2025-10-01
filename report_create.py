@@ -58,9 +58,9 @@ def create_report(account):
             return f"{account['email']} -> Token alınamadı!"
 
         # 2️⃣ Rapor oluşturma isteği
-        #headers = {"Authorization": f"Bearer {token}"} # alınan token burada kullanılıyor.
-        #report_resp = requests.post(report_url, json=payload, headers=headers)
-        #report_resp.raise_for_status()
+        headers = {"Authorization": f"Bearer {token}"} # alınan token burada kullanılıyor.
+        report_resp = requests.post(report_url, json=payload, headers=headers)
+        report_resp.raise_for_status()
 
         with counter_lock:
             report_counter += 1
