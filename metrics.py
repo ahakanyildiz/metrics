@@ -69,9 +69,13 @@ def monitor_system():
             # --- Diğer Metrikler ---
             # Sistemdeki açık dosya tanımlayıcıları (socket limitini görmek için önemli)
             try:
+                # psutil'in uygun metodunu kullan
                 open_files = psutil.test().num_fds
-            except:
-                 open_files = "N/A"
+            except AttributeError:
+                # num_fds mevcut değilse (bazı sistemlerde veya psutil sürümlerinde olabilir)
+                open_files = "N/A"
+            except Exception:
+                open_files = "Error"
             
             # Sistemdeki çalışan toplam işlem sayısı
             process_count = len(psutil.pids())
@@ -114,19 +118,24 @@ def stop_monitor(thread):
     print(f"\n[{datetime.now().strftime('%H:%M:%S')}] Sunucu metrik takibi sonlandırıldı.")
     print(f"Rapor '{REPORT_FILE}' dosyasında kaydedildi.")
 
-# --- Kullanım Örneği ---
+# --- Kullanım Örneği (SÜREKLİ İZLEME İÇİN DEĞİŞTİRİLDİ) ---
 if __name__ == "__main__":
     
     # 1. İzlemeyi başlat
     monitor_thread = start_monitor()
     
-    # 2. Burada yük testi kodunuzu çalıştırın (veya manuel olarak yük testini başlatın)
-    # ÖRNEK: 20 saniye boyunca metrik topla
-    print("Metrikler 20 saniye boyunca toplanıyor... Lütfen şimdi yük testinizi başlatın.")
+    # 2. Metriklerinizi sürekli toplayın
+    print("Metrikler toplanmaya başladı. Durdurmak ve raporu kaydetmek için **Ctrl+C** tuşlarına basın.")
+    
     try:
-        time.sleep(20) # Bu süreyi gerçek test sürenizle değiştirin
+        # Ana iş parçacığını, kullanıcı kesintisine (Ctrl+C) yanıt verecek şekilde sürekli aktif tutar.
+        while True:
+            time.sleep(0.1) 
     except KeyboardInterrupt:
-        pass
+        # Kullanıcı Ctrl+C bastığında bu blok çalışır
+        print("\nKullanıcı tarafından durdurma sinyali alındı.")
+        pass # Sonlandırma işlemine geç
+        
 
-    # 3. İzlemeyi durdur
+    # 3. İzlemeyi durdur ve dosyayı kaydet
     stop_monitor(monitor_thread)
